@@ -26,7 +26,52 @@ pip install transformers==4.35.2
 pip install torch==2.1.2
 
 
-解决：将chinese_L-12_H-768_A-12解压后的目录中Bert_config.json 改名为 config.json
+## 创建索引
+
+主要需要安装ik smart 插件
+
+```
+请求接口：
+PUT http://127.0.0.1:9200/medical_index
+
+需要在authorzation参数中设置basic auth账号和密码
+
+其中 dims 为向量的长度1024。
+
+# body raw参数如下：
+{
+    "settings": {
+        "number_of_shards": 3,
+        "number_of_replicas": 1
+    },
+    "mappings": {
+        "properties": {
+            "ask_vector": {  
+                "type": "dense_vector",  
+                "dims": 1024  
+            },
+			"ask": {  
+                "type": "text",
+                "analyzer": "ik_max_word",
+                "search_analyzer": "ik_smart"
+            },
+            "answer": {  
+                "type": "text",
+                "analyzer": "ik_max_word",
+                "search_analyzer": "ik_smart"
+            }
+        }
+    }
+}
+
+```
+
+## 存入数据
+```
+python 
+```
+
+
 
 ## 测试数据和模型
 
@@ -40,9 +85,6 @@ https://github.com/xiaonian0430/Chinese-medical-dialogue-data
 
 https://huggingface.co/hfl/chinese-roberta-wwm-ext-large
 
-https://github.com/ymcui/Chinese-BERT-wwm
-
-https://github.com/ymcui/Chinese-LLaMA-Alpaca-2
 
 
 

@@ -42,7 +42,7 @@ def search_similar(index_name, query_text, tokenizer, model, es, top_k=3):
             "script_score": {
                 "query": {"match_all": {}},
                 "script": {
-                    "source": "cosineSimilarity(params.queryVector, 'ask_vector') + 1.0",
+                    "source": "cosineSimilarity(params.queryVector, 'ask_vector')",
                     "lang": "painless",
                     "params": {
                         "queryVector": query_embedding.tolist()
@@ -70,6 +70,11 @@ def main():
     # 分词器和模型
     tokenizer = BertTokenizer.from_pretrained(model_name)
     model = BertModel.from_pretrained(model_name)
+
+    # 加速优化
+    model_quantized = torch.quantization.quantize_dynamic(
+        model.to("cpu"), {torch.nn.Linear}, dtype=torch.qint8
+    )
     
     # ES 连接
     es = Elasticsearch(
@@ -79,9 +84,8 @@ def main():
     )
 
     query_text = "我有高血压可以拿党参泡水喝吗"
-    query_text = "华中科技大学本科生"
     timestamp = int(time.time() * 1000)
-    similar_documents = search_similar(index_name, query_text, tokenizer, model, es)
+    similar_documents = search_similar(index_name, query_text, tokenizer, model_quantized, es)
     timestamp2 = int(time.time() * 1000)
     print((timestamp2-timestamp)/1000)
     for item in similar_documents:

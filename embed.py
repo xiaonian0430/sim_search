@@ -1,5 +1,6 @@
 from transformers import BertTokenizer, BertModel
 import torch
+import numpy as np
 
 # 模型下载的地址
 model_name = 'D:\\chinese_roberta_wwm_large_ext'
@@ -38,7 +39,14 @@ def embeddings(docs, max_length=300):
 
 
 if __name__ == '__main__':
-    res = embeddings(["你好，你叫什么名字"])
-    print(res)
-    print(len(res))
-    print(len(res[0]))
+    vector1 = embeddings(["你好，你叫什么名字"])
+    vector2 = embeddings(["华中科技大学"])
+
+    print(vector2)
+    print(len(vector2))
+    print(len(vector2[0]))
+
+    cos_sim = torch.cosine_similarity(vector1, vector2, dim=1)
+    # tensor([[0.9457]], device='cuda:0')
+    print(cos_sim)
+

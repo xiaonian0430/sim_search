@@ -21,7 +21,7 @@ def embeddings_doc(doc, tokenizer, model, max_length=300):
     print(timestamp2-timestamp)
     # 前向传播
     with torch.no_grad():
-        outputs = model(input_id, attention_mask=attention_mask)
+        outputs = model(input_id, attention_mask=attention_mask).to(0)
     timestamp3 = int(time.time() * 1000)
     print(timestamp3-timestamp2)
 
@@ -42,7 +42,7 @@ def search_similar(index_name, query_text, tokenizer, model, es, top_k=3):
             "script_score": {
                 "query": {"match_all": {}},
                 "script": {
-                    "source": "cosineSimilarity(params.queryVector, 'ask_vector') + 1.0",
+                    "source": "cosineSimilarity(params.queryVector, 'ask_vector')",
                     "lang": "painless",
                     "params": {
                         "queryVector": query_embedding.tolist()
@@ -79,7 +79,6 @@ def main():
     )
 
     query_text = "我有高血压可以拿党参泡水喝吗"
-    query_text = "华中科技大学本科生"
     timestamp = int(time.time() * 1000)
     similar_documents = search_similar(index_name, query_text, tokenizer, model, es)
     timestamp2 = int(time.time() * 1000)

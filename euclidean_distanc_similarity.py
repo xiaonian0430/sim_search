@@ -45,11 +45,7 @@ def search_similar(index_name, query_text, tokenizer, model, es, top_k=3):
         "size": top_k
     }
     res = es.search(index=index_name, body=query)
-    hits = res['hits']['hits']
-    similar_documents = []
-    for hit in hits:
-        similar_documents.append(hit['_source'])
-    return similar_documents
+    return res['hits']['hits']
 
 
 def main():
@@ -75,12 +71,11 @@ def main():
     )
 
     query_text = "我有高血压可以拿党参泡水喝吗"
-
+    # query_text = "华中科技大学本科生"
     similar_documents = search_similar(index_name, query_text, tokenizer, model, es)
     for item in similar_documents:
         print("================================")
-        print('ask：', item['ask'])
-        print('answer：', item['answer'])
+        print(item)
 
 
 if __name__ == '__main__':
